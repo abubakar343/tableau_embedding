@@ -29,4 +29,3 @@ scriptElement.onload = function() {
 
     // Add your custom logic here, like buttons to control size
 };
-
