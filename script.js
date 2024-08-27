@@ -1,31 +1,39 @@
-// Load the Tableau Embedding API script dynamically
-const scriptElement = document.createElement('script');
-scriptElement.src = 'https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.js';
-document.head.appendChild(scriptElement);
+import { SheetType, TableauEventType } from 'https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.js';
 
-scriptElement.onload = function() {
-    // Get the Tableau Viz element
-    const vizElement = document.getElementById('tableauViz');
+// Get the viz object from the HTML web component
+const viz = document.querySelector('tableau-viz, tableau-authoring-viz');
 
-    // Wait for the viz to become interactive
-    vizElement.addEventListener('firstinteractive', () => {
-        console.log('Tableau Viz is interactive');
-    });
+// window.token is the JWT generated using a Connected App configured with Direct Trust.
+// The value is generated and is only available when this code executes within the Embedding Playground.
+// See the Connected Apps documentation (https://sfdc.co/ca-direct) for more information.
+// See this repository (https://sfdc.co/ca-jwt) for samples in various languages.
+viz.token = window.token;
 
-    // Example function to set the Viz to full-screen size
-    function setFullSize() {
-        vizElement.style.width = '100%';
-        vizElement.style.height = '100vh';
-    }
+// Wait for the viz to become interactive
+await new Promise((resolve, reject) => {
+  // Add an event listener to verify the viz becomes interactive
+  viz.addEventListener(TableauEventType.FirstInteractive, () => {
+    console.log('Viz is interactive!');
+    resolve();
+  });
 
-    // Example function to reset the Viz to default size
-    function resetSize() {
-        vizElement.style.width = '800px';
-        vizElement.style.height = '600px';
-    }
+  viz.addEventListener(TableauEventType.VizLoadError, (error) => {
+    const message = JSON.parse(error.detail.message);
+    const errorMessage = JSON.parse(message.errorMessage);
 
-    // Example: Automatically set to full-screen size on load
-    setFullSize();
+    const displayMessage = `ca-error-${errorMessage.result.errors[0].code}`;
+    reject(displayMessage);
+  });
+});
 
-    // Add your custom logic here, like buttons to control size
-};
+let dashboard;
+let worksheet;
+if (viz.workbook.activeSheet.sheetType === SheetType.Dashboard) {
+  dashboard = viz.workbook.activeSheet;
+
+  // Provide the name of the worksheet you want to use from the dashboard
+  worksheet = dashboard.worksheets.find((ws) => ws.name === 'Replace-Name-of-Worksheet');
+} else {
+  // Active sheet is already a worksheet
+  worksheet = viz.workbook.activeSheet;
+}
