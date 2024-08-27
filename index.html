@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau Dashboard Embed</title>
+    <title>Tableau Embed Example</title>
 </head>
 <body>
-    <div id="tableauVizContainer" style="width: 100%; height: 100vh;"></div>
+    <!-- Tableau Viz -->
+    <tableau-viz
+      id="tableauViz"
+      src="https://public.tableau.com/views/DeveloperSuperstore/Overview"
+      device="desktop"
+      hide-tabs
+      toolbar="bottom"
+      style="width: 100%; height: 90vh;"
+    ></tableau-viz>
 
     <!-- Link to your JavaScript file -->
     <script src="script.js"></script>
